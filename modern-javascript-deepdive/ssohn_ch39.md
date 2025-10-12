@@ -165,3 +165,164 @@
 ### 39.3.3 자식 노드 존재 확인
 
 - 자식 노드가 존재하는지 확인하려면 Node.prototype.hasChildNodes 메서드를 사용한다.
+- hasChildNodes 메서드는 childNodes 프로퍼티와 마찬가지로 텍스트 노드를 포함하여 자식 노드의 존재를 확인한다.
+- 자식 노드 중에 텍스트 노드가 아닌 요소 노드가 존재하는지 확인하려면 hasChildNodes 메서드 대신 children.length 또는 Element 인터페이스의 chileElementCount 프로퍼티를 사용한다.
+
+### 39.3.4 요소 노드의 텍스트 노드 탐색
+
+- 요소 노드의 텍스트 노드는 요소 노드의 자식 노드다.
+- 따라서 요소 노드의 텍스트 노드는 firstChild 프로퍼티로 접근할 수 있다.
+
+### 39.3.5 부모 노드 탐색
+
+- 부모 노드를 탐색하려면 Node.prototype.parentNode 프로퍼티를 사용한다. 텍스트 노드는 DOM 트리의 최종단 노드인 리프 노드이므로 부모 노드가 텍스트 노드인 경우는 없다.
+
+### 39.3.6 형제 노드 탐색
+
+- 부모 노드가 같은 형제 노드를 탐색하려면 다음과 같은 노드 탐색 프로퍼티를 사용한다.
+- 단 어트리뷰트 노드는 요소 노드와 연결되어 있지만 부모 노드가 같은 형제 노드가 아니기 때문에 반환되지 않는다.
+- 즉 아래 프로퍼티는 텍스트 노드 또는 요소 노드만 반환한다.
+
+#### Node 탐색 프로퍼티
+
+| 프로퍼티 | 설명 |
+|---------|------|
+| `Node.prototype.previousSibling` | 부모 노드가 같은 형제 노드 중에서 자신의 이전 형제 노드를 탐색하여 반환한다. `previousSibling` 프로퍼티가 반환하는 형제 노드는 요소 노드뿐만 아니라 텍스트 노드일 수도 있다. |
+| `Node.prototype.nextSibling` | 부모 노드가 같은 형제 노드 중에서 자신의 다음 형제 노드를 탐색하여 반환한다. `nextSibling` 프로퍼티가 반환하는 형제 노드는 요소 노드뿐만 아니라 텍스트 노드일 수도 있다. |
+
+#### Element 탐색 프로퍼티
+
+| 프로퍼티 | 설명 |
+|---------|------|
+| `Element.prototype.previousElementSibling` | 부모 노드가 같은 형제 요소 노드 중에서 자신의 이전 형제 요소 노드를 탐색하여 반환한다. `previousElementSibling` 프로퍼티는 요소 노드만 반환한다. |
+| `Element.prototype.nextElementSibling` | 부모 노드가 같은 형제 요소 노드 중에서 자신의 다음 형제 요소 노드를 탐색하여 반환한다. `nextElementSibling` 프로퍼티는 요소 노드만 반환한다. |
+
+## 39.4 노드 정보 취득
+
+- 노드 객체에 대한 정보를 취득하려면 다음과 같은 노드 정보 프로퍼티를 사용한다.
+| 프로퍼티 | 설명 |
+|---------|------|
+| `Node.prototype.nodeType` | 노드 객체의 종류, 즉 노드 타입을 나타내는 상수를 반환한다. 노드 타입 상수는 Node에 정의되어 있다.<br>• `Node.ELEMENT_NODE`: 요소 노드 타입을 나타내는 상수 1을 반환<br>• `Node.TEXT_NODE`: 텍스트 노드 타입을 나타내는 상수 3을 반환<br>• `Node.DOCUMENT_NODE`: 문서 노드 타입을 나타내는 상수 9를 반환 |
+| `Node.prototype.nodeName` | 노드의 이름을 문자열로 반환한다.<br>• 요소 노드: 대문자 문자열로 태그 이름("UL", "LI" 등)을 반환<br>• 텍스트 노드: 문자열 "#text"를 반환<br>• 문서 노드: 문자열 "#document"를 반환 |
+
+## 39.5 요소 노드의 텍스트 조작
+
+### 39.5.1 nodeValue
+
+- Node.prototype.nodeValue 프로퍼티는 setter와 getter 모두 존재하는 접근자 프로퍼티다.
+- 따라서 nodeValue 프로퍼티는 참조와 할당 모두 가능하다.
+- 노드 객체의 nodeValue 프로퍼티를 참조하면 노드 객체의 값을 반환한다.
+- 노드 객체의 값이란 텍스트 노드의 텍스트다.
+- 따라서 문서 노드나 요소노드의 nodeValue 프로퍼티를 참조하면 null을 반환한다.
+- 텍스트 노드의 nodeValue 프로퍼티를 참조할 때만 텍스트 노드의 갓, 즉 텍스트를 반환한다.
+- 텍스트 노드의 nodeValue 프로퍼티에 값을 할당하면 텍스트 노드의 값 즉 텍스트를 변경할 수 있다.
+- 따라서 요소 노드의 텍스트를 변경하려면 다음과 같은 순서의 처리가 필요하다.
+  1. 텍스트를 변경할 요소 노드를 취득한 다음, 취득한 요소 노드의 텍스트 노드를 탐색한다. 텍스트 노드는 요소 노드의 자식 노드이므로 firstChild 프로퍼티를 사용하여 탐색한다.
+  2. 탐색한 텍스트 노드의 nodeValude 프로퍼티를 사용하여 텍스트 노드의 값을 변경한다.
+
+### 39.5.2 textContent
+
+- Node.prototype.textContent 프로퍼티는 setter와 getter 모두 존재하는 접근자 프로퍼티로서 요소 노드의 텍스트와 모든 자손 노드의 텍스트를 모두 취득하거나 변경한다.
+- 요소 노드의 textContent 프로퍼티를 참조하면 요소 노드의 콘텐츠 영역(시작 태그와 종료 태그 사이) 내의 텍스트를 모두 반환한다.
+- 요소 노드의 childNodes 프로퍼티가 반환한 모든 노드들의 텍스트 노드의 값, 즉 텍스트를 모두 반환한다.
+- 이때 HTML 마크업은 무시된다.
+
+## 39.6 DOM 조작
+
+- DOM 조작은 새로운 노드를 생성하여 DOM에 추가하거나 기존 노드를 삭제 또는 교체하는 것을 말한다.
+- DOM 조작에 의해 DOM에 새로운 노드가 추가되거나 삭제되면 리플로우와 리페인트가 발생하는 원인이 되므로 성능에 영향을 준다.
+
+### 39.6.1 innerHTML
+
+- Element.prototype.innerHTML 프로퍼티는 setter와 getter 모두 존재하는 접근자 프로퍼티로서 요소 노드의 HTML 마크업을 취득하거나 변경한다.
+- 요소 노드의 innerHTML 프로퍼티를 참조하면 요소 노드의 콘텐츠 영역(시작 태그와 종료 태그 사이) 내에 포함된 모든 HTML 마크업을 문자열로 반환한다.
+- innerHTML 프로퍼티는 HTML 마크업이 포함된 문자열을 그대로 반환한다.
+- 요소 노드의 innerHTML 프로퍼티에 문자열을 할당하면 요소 노드의 모든 자식 노드가 제거되고 할당한 문자열에 포함되어 있는 HTML 마크업이 파싱되어 요소 노드의 자식 노드로 DOM에 반영된다.
+- 사용자로부터 입력받은 데이터를 그대로 innerHTML 프로퍼티에 할당하는 것은 **크로스 사이트 스크립팅 공격**에 취약하므로 위험하다.
+- HTML5는 innerHTML 프로퍼티로 삽입된 script 요소 내의 자바스크립트 코드를 실행하지 않는다.
+- innerHTML 프로퍼티의 또 다른 단점은 요소 노드의 innerHTML 프로퍼티에 HTML 마크업 문자열을 할당하는 경우 요소 노드의 모든 자식 노드를 제거하고 할당한 HTML 마크업 문자열을 파싱하여 DOM을 변경한다는 것이다.
+
+### 39.6.2 insertAdjacentHTML 메서드
+
+- Element.prototype.insertAdjacentHTML(position, DOMString) 메서드는 기존 요소를 제거하지 않으면서 위치를 지정해 새로운 요소를 삽입한다.
+- insertAdjacentHTML 메서드는 기존 요소에는 영향을 주지 않고 새롭게 삽입될 요소만을 파싱하여 자식 요소로 추가하므로 기존 자식 노드를 모두 제거하고 다시 처음부터 새롭게 자식 노드를 생성하여 자식 요소로 추가하는 innerHTML 프로퍼티보다 효율적이고 빠르다.
+- 크로스 사이트 스크립트 공격에 취약하다.
+
+### 39.6.3 노드 생성과 추가
+
+- DOM은 노드를 직접 생성/삽입/삭제/치환하는 메서드도 제공한다.
+
+#### 요소 노드 생성
+
+- Document.prototype.createElement(tagName) 메서드는 요소 노드를 생성하여 반환한다.
+- createElement 메서드의 매개 변수는 tagName에는 태그 이름을 나타내는 문자열을 인수로 전달한다.
+- createElement 메서드는 요소 노드를 생성할 뿐 DOM에 추가하지 않는다. 따라서 이후에 생성된 요소 노드를 DOM에 추가하는 처리가 별도로 필요하다.
+- createElement 메서드로 생성한 요소 노드는 아무런 자식 노드를 가지고 있지 않다.
+
+#### 텍스트 노드 생성
+
+- Document.prototype.createTextNode(text) 메서드는 텍스트 노드를 생성하여 반환한다.
+- 문자열을 인수로 전달한다.
+- 텍스트 노드는 요소 노드의 자식 노드다. 하지만 createTextNode 메서드로 생성한 텍스트 노드는 요소 노드의 자식 노드로 추가되지 않고 홀로 존재하는 상태다.
+- 따라서 이후에 생성된 텍스트 노드를 요소 노드에 추가하는 처리가 별도로 필요하다.
+
+#### 텍스트 노드를 요소 노드의 자식 노드로 추가
+
+- Node.prototype.appendChild(childNode) 메서드는 매개 변수 childNode에게 인수로 전달한 노드를 appendChild 메서드를 호출한 노드의 마지막 자식 노드로 추가한다.
+- appendChild 메서드의 인수로 createTextNode 메서드로 생성한 텍스트 노드를 전달하면 appendChild 메서드를 호출한 노드의 마지막 자식 노드로 텍스트 노드가 추가된다.
+- 요소 노드에 자식 노드가 있는 경우 요소 노드의 textContent 프로퍼티에 문자열을 할당하면 요소 노드의 모든 자식 노드가 제거되고 할당한 문자열이 텍스트로 추가되므로 주의해야 한다.
+
+#### 요소 노드를 DOM에 추가
+
+- Node.prototype.appendChild(childNode) 메서드를 사용하여 텍스트 노드와 부자 관계로 연결한 요소노드를 다른 요소 노드의 마지막 자식 요소로 추가한다.
+
+### 39.6.4 복수의 노드 생성과 추가
+
+- DOM을 여러 번 변경하는 문제를 회피하기 위해 컨테이너 요소를 사용해보자.
+
+### 39.6.5 노드 삽입
+
+#### 마지막 노드로 추가
+
+- Node.prototype.appendChild 메서드는 인수로 전달받은 노드를 자신을 호출한 노드의 마지막 자식 노드로 DOM에 추가한다. 이때 노드를 추가할 위치를 지정할 수 없고 언제나 마지막 자식 노드로 추가한다.
+
+#### 지정한 위치에 노드 삽입
+
+- Node.prototype.insertBefore(newNode, childNode) 메서드는 첫 번째 인수로 전달받은 노드를 두 번째 인수로 전달받은 노드 앞에 삽입한다.
+- 두 번째 인수로 전달받은 노드는 반드시 insertBefore 메서드를 호출한 노드의 자식 노드이어야 한다. 그렇지 않으면 DOMException 에러가 발생한다.
+- 두 번째 인수로 전달받은 노드가 null이면 첫 번째 인수로 전달받은 노드를 insertBefore 메서드를 호출한 노드의 마지막 자식 노드로 추가된다.
+
+### 39.6.6 노드 이동
+
+- DOM에 이미 존재하는 노드를 appendChild 또는 insertBefoe 메서드를 사용하여 DOM에 다시 추가하면 현재 위치에서 노드를 제거하고 새로운 위치에 노드를 추가한다. 즉 노드가 이동한다.
+
+### 39.6.7 노드 복사
+
+- Node.prototype.cloneNode([deep: true | false]) 메서드는 노드의 사본을 생성하여 반환한다.
+
+### 39.6.8 노드 교체
+
+- Node.prototype.replaceChild(newChild, oldChild) 메서드는 자신을 호출한 노드의 자식 노드를 다른 노드로 교체한다.
+- replaceChild 메서드는 자신을 호출한 노드의 자식 노드인 oldChild 노드를 newChld 노드를 교체한다. 이때 oldChild 노드는 DOM에서 제거된다.
+
+### 39.6.9 노드 삭제
+
+- Node.prototype.removeChild(child) 메서드는 child 매개변수에 인수로 전달한 노드를 DOM에서 삭제한다.
+- 인수로 전달한 노드는 removeChild 메서드를 호출한 노드의 자식 노드이어야 한다.
+
+## 39.7 어트리뷰트
+
+### 39.7.1 어트리뷰트 노드와 attributes 프로퍼티
+
+- 요소 노드의 모든 어트리뷰트 노드는 요소 노드의 Element.prototype.attributes 프로퍼티로 최득할 수 있다.
+- attributes 프로퍼티는 getter만 존재하는 읽기 전용 접근자 프로퍼티이며, 요소 노드의 모든 어트리뷰트 노드의 참조가 담긴 NamedNodeMap 객체를 반환한다.
+
+### 39.7.2 HTML 어트리뷰트 조작
+
+- Element.prototype.getAttribute/setAttribute 메서드를 사용하면 attributes 프로퍼티를 통하지 않고 요소 노드에서 메서드를 통해 직접 HTML 어트리뷰트 값을 취득하거나 변경할 수 있다.
+- HTML 어트리뷰트 값을 참조하려면 Element.prototype.getAttribute(attributeName) 메서드를 사용한다.
+- HTML 어트리뷰트 값을 변경하려면 Element.prototype.setAttribute(attributeName, attributeValue) 메서드를 사용한다.
+- 특정 HTML 어트리뷰트가 존재하는지 확인하려면 Element.prototype.hasAttribute(attributeName) 메서드를 사용한다.
+- 특정 HTML 어트리뷰트를 삭제하려면 Element.prototype.removeAttribute(attributeName) 메서드를 사용한다.
+
+### 39.7.3 HTML 어트리뷰트 vs DOM 프로퍼티
