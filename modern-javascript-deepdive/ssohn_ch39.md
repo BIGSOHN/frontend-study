@@ -326,3 +326,79 @@
 - 특정 HTML 어트리뷰트를 삭제하려면 Element.prototype.removeAttribute(attributeName) 메서드를 사용한다.
 
 ### 39.7.3 HTML 어트리뷰트 vs DOM 프로퍼티
+
+- 요소 노드 객체에는 HTML 어트리뷰트에 대응하는 프로퍼티(이하 DOM 프로퍼티)가 존재한다. 이 DOM 프로퍼티들은 HTML 어트리뷰트 값을 초기값으로 가지고 있다.
+- DOM 프로퍼티는 setter와 getter 모두 존재하는 접근자 프로퍼티다. 따라서 DOM 프로퍼티는 참조와 변경이 가능하다.
+- **HTML 어트리뷰트의 역할은 HTML 요소의 초기 상태를 지정하는 것이다. 즉 HTML 어트리뷰트 값은 HTML 요소의 초기 상태를 의미하며 이는 변하지 않는다.**
+- **요소 노드는 상태(state)를 가지고 있다.**
+- **요소 노드는 2개의 상태, 즉 초기 상태와 최신 상태를 관리해야 한다. 요소 노드의 초기 상태는 어트리뷰트 노드가 관리하며, 요소 노드의 최신 상태는 DOM 프로퍼티가 관리한다.**
+
+#### 어트리뷰트 노드
+
+- **HTML 어트리뷰트로 지정한 HTML 요소의 초기 상태는 어트리뷰트 노드에서 관리한다.**
+- 어트리뷰트 노드에서 관리하는 어트리뷰트 값은 사용자의 입력에 의해 상태가 변경되어도 변하지 않고 HTML 어트리뷰트로 지정한 HTML 요소의 초기 상태를 그대로 유지한다.
+- 어트리뷰트 노드가 관리하는 초기 상태 값을 취득하거나 변경하려면 getAttribute/setAttribute 메서드를 사용한다.
+
+#### DOM 프로퍼티
+
+- **사용자가 입력한 최신 상태는 HTML 어트리뷰트에 대응하는 요소 노드이 DOM 프로퍼티가 관리한다.**
+- **DOM 프로퍼티는 사용자의 입력에 의한 상태 변화에 반응하여 언제나 최신 상태를 유지한다.**
+- DOM 프로퍼티에 값을 할당하는 것은 HTML 요소의 최신 상태 값을 변경하는 것을 의미한다. 즉 사용자가 상태를 변경하는 행위와 같다.
+- 이때 HTML 요소에 지정한 어트리뷰트 값에는 어떠한 영향도 주지 않는다.
+
+#### HTML 어트리뷰트와 DOM 프로퍼티의 대응 관계
+
+- 대부분의 HTML 어트리뷰트는 HTML 어트리뷰트 이름과 동일한 DOM 프로퍼티와 1:1로 대응한다. 단, 다음과 같이 HTML 어트리뷰트와 DOM 프로퍼티가 언제나 1:1로 대응하는 것은 아니며, HTML 어트리뷰트 이름과 DOM 프로퍼티 키가 반드시 일치하는 것도 아니다.
+
+  - `id` 어트리뷰트와 `id` 프로퍼티는 1:1 대응하며, 동일한 값으로 연동한다.
+  - `input` 요소의 `value` 어트리뷰트는 `value` 프로퍼티와 1:1 대응한다. 하지만 `value` 어트리뷰트는 초기 상태를, `value` 프로퍼티는 최신 상태를 갖는다.
+  - `class` 어트리뷰트는 `className`, `classList` 프로퍼티와 대응한다.
+  - `for` 어트리뷰트는 `htmlFor` 프로퍼티와 1:1 대응한다.
+  - `td` 요소의 `colspan` 어트리뷰트는 대응하는 프로퍼티가 존재하지 않는다.
+  - `textContent` 프로퍼티는 대응하는 어트리뷰트가 존재하지 않는다.
+  - 어트리뷰트 이름은 대소문자를 구별하지 않지만 대응하는 프로퍼티 키는 카멜 케이스를 따른다(maxlength → maxLength).
+
+#### DOM 프로퍼티 값의 타입
+
+- getAttribute 메서드로 취득한 어트리뷰트 값은 언제나 문자열이다. 하지만 DOM 프로퍼티로 취득한 최신 상태 값은 문자열이 아닐 수도 있다.
+
+### 39.7.4 data 어트리뷰트와 dataset 프로퍼티
+
+- data 어트리뷰트와 dataset 프로퍼티를 사용하면 HTML 요소에 정의한 사용자 정의 어트리뷰트와 자바스크립트 간에 데이터를 교환할 수 있다.
+- data 어트리뷰트는 data-user-id, data-role과 같이 data- 접두사 다음에 임의의 이름을 붙여 사용한다.
+- data 어트리뷰트의 값은 HTMLElement.dataset 프로퍼티로 취득할 수 있다.
+- data 어트리뷰트이 data- 접두사 다음에 존재하지 않는 이름을 키로 사용하여 dataset 프로퍼티에 값을 할당하면 HTML 요소에 data 어트리뷰트가 추가된다.
+
+## 39.8 스타일
+
+### 39.8.1 인라인 스타일 조작
+
+- HTMLElement.prototype.style 프로퍼티는 setter와 getter 모두 존재하는 접근자 프로퍼티로서 요소 노드의 **인라인 스타일**을 취득하거나 추가 또는 변경한다.
+- style 프로퍼티를 참조하면 CSSStyleDeclaration 타입의 객체를 반환한다.
+- CSSStyleDeclaration 객체는 다양한 CSS 프로퍼티에 대응하는 프로퍼티를 가지고 있으며, 이 프로퍼티에 값을 할당하면 해당 CSSS 프로퍼티가 인라인 스타일로 HTML 요소에 추가되거나 변경된다.
+
+### 39.8.2 클래스 조작
+
+- .으로 시작하는 클래스 선택자를 사용하여 CSS class를 미리 정의한 다음, HTML 요소의 class 어트리뷰트 값을 변경하여 HTML 요소의 스타일을 변경할 수도 있다.
+- 단 class 어트리뷰트에 대응하는 DOM 프로퍼티는 class가 아니라 className과 classList다.
+
+#### className
+
+- Element.prototype.className 프로퍼티는 setter와 getter 모두 존재하는 접근자 프로퍼티로서 HTML 요소의 class 어트리뷰트 값을 취득하거나 변경한다.
+- 요소 노드의 className 프로퍼티를 참조하면 class 어트리뷰트 값을 문자열로 반환하고, 요소 노드의 className 프로퍼티에 문자열을 할당하면 class 어트리뷰트 값을 할당한 문자열로 변경한다.
+- className 프로퍼티는 문자열을 반환하므로 공백으로 구분된 여러 개의 클래스를 반환하는 경우 다루기가 불편하다.
+
+#### classList
+
+- Element.prototype.classList 프로퍼티는 class 어트리뷰트의 정보를 담은 DOMTokenList 객체를 반환한다.
+- DOMTokenList 객체는 class 어트리뷰트의 정보를 나타내는 컬렉션 객체로서 유사 배열 객체이면서 이터러블이다.
+- DOMTokenList 객체가 제공하는 메서드들
+  - add(...className) : add 메서드는 인수로 전달한 1개 이상의 문자열을 class 어트리뷰트 값으로 추가한다.
+  - remove(...className) : 인수로 전달한 1개 이상의 문자열과 일치하는 클래스를 class 어트리뷰트에서 삭제한다.
+  - item(index) : 인수로 전달한 index에 해당하는 클래스를 class 어트리뷰트에서 반환한다.
+  - contains(className) : 인수로 전달한 문자열과 일치하는 클래스가 class 어트리뷰트에 포함되어 있는지 확인한다.
+  - replace(oldClassName, newClassName) : 첫 번째 인수로 전달한 문자열을 두 번째 인수로 전달한 문자열로 변경한다.
+  - toggle(className[, force]) : class 어트리뷰트에 인수로 전달한 문자열과 일치하는 클래스가 존재하면 제거하고, 존재하지 않으면 추가한다.
+- 이 밖에도 DOMTokenList 객체는 forEach, entries, keys, values, supports 메서드를 제공한다.
+
+### 39.8.3 요소에 적용되어 있는 CSS 스타일 참조
