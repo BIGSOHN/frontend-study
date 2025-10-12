@@ -48,14 +48,14 @@
 - DOM은 HTML 문서의 계층적 구조와 정보를 표현하며 이를 제어할 수 있는 API 즉 프로퍼티와 메서드를 제공하는 트리 자료구조라고 했다.
 - 즉 DOM을 구성하는 노드 객체는 자신의 구조와 정보를 제어할 수 있는 DOM API를 사용할 수 있다. 이를 통해 노드 객체는 자신의 부모 형제 자식을 탐색할 수 있으며, 자신의 어트리뷰트와 텍스트를 조작할 수도 있다.
 - DOM을 구성하는 노드 객체는 ECMAScript 사양에 정의된 표준 빌트인 객체가 아니라 브라우저 환경에서 추가적으로 제공하는 호스트 객체다. 하지만 노드 객체도 자바스크립트 객체이므로 프로토타입에 의한 상속 구조를 갖는다.
-- | input 요소 노드 객체의 특성 | 프로토타입을 제공하는 객체 |
-|---|---|
-| 객체 | Object |
-| 이벤트를 발생시키는 객체 | EventTarget |
-| 트리 자료구조의 노드 객체 | Node |
-| 브라우저가 렌더링할 수 있는 웹 문서의 요소(HTML, XML, SVG)를 표현하는 객체 | Element |
-| 웹 문서의 요소 중에서 HTML 요소를 표현하는 객체 | HTMLElement |
-| HTML 요소 중에서 input 요소를 표현하는 객체 | HTMLInputElement |
+- | input 요소 노드 객체의 특성                                                | 프로토타입을 제공하는 객체 |
+  | -------------------------------------------------------------------------- | -------------------------- |
+  | 객체                                                                       | Object                     |
+  | 이벤트를 발생시키는 객체                                                   | EventTarget                |
+  | 트리 자료구조의 노드 객체                                                  | Node                       |
+  | 브라우저가 렌더링할 수 있는 웹 문서의 요소(HTML, XML, SVG)를 표현하는 객체 | Element                    |
+  | 웹 문서의 요소 중에서 HTML 요소를 표현하는 객체                            | HTMLElement                |
+  | HTML 요소 중에서 input 요소를 표현하는 객체                                | HTMLInputElement           |
 - 노드 객체에는 노드 객체의 종류, 즉 노드 타입에 상관없이 모든 노드 객체가 공통으로 갖는 기능도 있고, 노드 타입에 따라 고유한 기능도 있다.
 - 노드 객체는 공통된 기능일수록 프로토타입 체인의 상위에, 개별적인 고유 기능일수록 프로토타입 체인의 하위에 프로토타입 체인을 구축하여 노드 객체 필요한 기능, 즉 프로퍼티와 메서드를 제공하는 상속 구조를 갖는다.
 - **DOM은 HTML 문서의 계층적 구조와 정보를 표현하는 것은 물론 노드 객체의 종류, 즉 노드 타입에 따라 필요한 기능을 프로퍼티와 메서드의 집합인 DOM API로 제공한다. 이 DOM API를 통해 HTML의 구조나 내용 또는 스타일 등을 동적으로 조작할 수 있다.**
@@ -76,7 +76,7 @@
 
 - Document.prototype/Element.prototype.getElementsByTagName 메서드는 인수로 전달한 태그 이름을 갖는 모든 요소 노드들을 탐색하여 반환한다. getElementsByTagName 메서드는 여러 개의 요소 노드 객체를 갖는 DOM 컬렉션 객체인 HTMLCollection 객체를 반환한다.
 - getElementsByTagName 메서드가 반환하는 DOM 컬렉션 객체인 HTMLCollection 객체는 유사 배열 객체이면서 이터러블이다.
-- HTML 문서의 모든 요소 노드를 취득하려면 getElementsByTagName 메서드의 인수로 '*'를 전달한다.
+- HTML 문서의 모든 요소 노드를 취득하려면 getElementsByTagName 메서드의 인수로 '\*'를 전달한다.
 - Document.prototype.getElementsByTagName 메서드는 DOM의 루트 노드인 문서 노드 즉 document를 통해 호출하며 DOM 전체에서 요소 노드를 탐색하여 반환한다.
 - Element.prototype.getElementsByTagName 메서드는 특정 요소 노드를 통해 호출하며, 특정 요소 노드의 자손 노드 중에서 요소 노드를 탐색하여 반환한다.
 
@@ -92,13 +92,13 @@
 
 - CSS 선택자는 스타일을 적용하고자 하는 HTML 요소를 특정할 때 사용하는 문법이다.
 - Document.prototype/Element.prototype.querySelector 메서드는 인수로 전달한 CSS 선택자를 만족시키는 하나의 요소 노드를 탐색하여 반환한다.
-	- 인수로 전달한 CSS 선택자를 만족시키는 요소 노드가 여러 개인 경우 첫 번째 요소 노드만 반환한다.
-	- 인수로 전달돈 CSS 선택자를 만족시키는 요소 노드가 존재하지 않는 경우 null을 반환한다.
-	- 인수로 전달한 CSS 선택자가 문법에 맞지 않는 경우 DOMException 에러가 발생한다.
+  - 인수로 전달한 CSS 선택자를 만족시키는 요소 노드가 여러 개인 경우 첫 번째 요소 노드만 반환한다.
+  - 인수로 전달돈 CSS 선택자를 만족시키는 요소 노드가 존재하지 않는 경우 null을 반환한다.
+  - 인수로 전달한 CSS 선택자가 문법에 맞지 않는 경우 DOMException 에러가 발생한다.
 - Document.prototype/Element.prototype.querySelectorAll 메서드는 인수로 전달한 CSS 선택자를 만족시키는 모든 요소 노드를 탐색하여 반환한다.
-	- 인수로 전달한 CSS 선택자를 만족시키는 요소 노드가 여러 개인 경우 첫 번째 요소 노드만 반환한다.
-	- 인수로 전달된 CSS 선택자를 만족시키는 요소 노드가 존재하지 않는 경우 null을 반환한다.
-	- 인수로 전달한 CSS 선택자가 문법에 맞지 않는 경우 DOMExecption 에러가 발생한다.
+  - 인수로 전달한 CSS 선택자를 만족시키는 요소 노드가 여러 개인 경우 첫 번째 요소 노드만 반환한다.
+  - 인수로 전달된 CSS 선택자를 만족시키는 요소 노드가 존재하지 않는 경우 null을 반환한다.
+  - 인수로 전달한 CSS 선택자가 문법에 맞지 않는 경우 DOMExecption 에러가 발생한다.
 - Document.prototype/Element.prototype.querySelectorAll 메서드는 인수로 전달한 CSS 선택자를 만족시키는 모든 요소 노드를 탐색하여 반환한다. querySelectorAll 메서드는 여러 개의 요소 노드 객체를 갖는 DOM 컬렉션 객체인 NodeList 객체를 반환한다. NodeList 객체는 유사 배열 객체이면서 이터러블이다.
 - id 어트리뷰트가 있는 요소 노드를 취득하는 경우에는 getElementById 메서드를 사용하고 그 외의 경우에는 querySelector, querySelectorAll 메서드를 사용하는 것을 권장한다.
 
@@ -108,3 +108,60 @@
 - Element.prototype.matches 메서드는 이벤트 위임을 사용할 때 유용하다.
 
 ### 39.2.6 HTMLCollection과 NodeList
+
+- DOM 컬렉션 객체인 HTMLCollection과 NodeList는 DOM API가 여러 개의 결과값을 반환하기 위한 DOM 컬렉션 객체다.
+- 이 둘 모두 유사 배열 객체이면서 이터러블이다.
+- 이 둘의 중요한 특징은 노드 객체의 상태 변화를 실시간으로 반영하는 **살아 있는 객체**라는 것이다.
+- HTMLCollection은 언제나 live 객체로 동작한다.
+- NodeList는 대부분의 경우 노드 객체의 상태 변화를 실시간으로 반영하지 않고 과거의 정적 상태를 유지하는 non-live 객체로 동작하지만 경우에 따라 live 객체로 동작할 때가 있다.
+
+#### HTMLCollection
+
+- HTMLCollection 객체는 노드 객체의 상태 변화를 실시간으로 반영하는 살아 있는 DOM 컬렉션 객체다. 따라서 HTMLCollection 객체를 살아 있는 객체라고 부르기도 한다.
+- HTMLCollection 객체는 실시간으로 노드 객체의 상태 변경을 반영하여 요소를 제거할 수 있기 때문에 HTMLCollection 객체를 for 문으로 순회하면서 노드 객체의 상태를 변경해야할 때 주의해야 한다.
+- 이 문제는 for 문을 역방향으로 순회하는 방법으로 회피할 수 있다.
+- 또는 while 문을 사용하여 HTMLCollection 객체에 노드 객체가 남아 있지 않을 때까지 무한 반복하는 방법으로 회피할 수도 있다.
+- 더 간단한 해결책은 HTMLCollection 객체를 사용하지 않는 것이다.
+- 유사 배열 객체이면서 이터러블인 HTMLCollection 객체를 배열로 변환하면 부작용을 발생시키는 HTMLCollection 객체를 사용할 필요가 없고 유용한 배열의 고차 함수를 사용할 수 있다. 즉 배열로 써라
+
+#### NodeList
+
+- HTMLCollection 객체의 부작용을 해결하기 위해 querySelectorAll 메서드를 사용하는 방법도 있다.
+- querySelectorAll 메서드는 DOM 컬렉션 객체인 NodeList 객체를 반환한다.
+- 이때 NodeList 객체는 실시간으로 노드 객체의 상태 변경을 반영하지 않는 객체다.
+- querySelectorAll이 반환하는 NodeList 객체는 NodeList.prototype.forEach 메서드를 상속받아 사용할 수 있다.
+- NodeList 객체는 대부분의 경우 노드 객체의 상태 변경을 실시간으로 반영하지 않고 과거의 정적 상태를 유지하는 non-live 객체로 동작한다.
+- 하지만 **chlindNodes 프로퍼티가 반환하는 NodeList 객체는 HTMLCollection 객체와 같이 실시간으로 노드 객체의 상태 변경을 반영하는 live 객체로 동작하므로 주의가 필요하다.**
+
+- **노드 객체의 상태 변경과 상관없이 안전하게 DOM 컬렉션을 사용하려면 HTMLCollection이나 NodeList 객체를 배열로 변환하여 사용하는 것을 권장한다.**
+
+## 39.3 노드 탐색
+
+- 요소 노드를 취득한 다음, 취득한 요소 노드를 기점으로 DOM 트리의 노드를 옮겨 다니며 부모, 형제, 자식 노드 등을 탐색해야 할 때가 있다.
+- DOM 트리 상의 노드를 탐색할 수 잇도록 Node, Element 인터페이스는 트리 탐색 프로퍼티를 제공한다.
+- 노드 탐색 프로퍼티는 모두 접근자 프로퍼티다. 단 노드 탐색 프로퍼티는 setter 없이 getter만 존재하여 참조만 가능한 읽기 전용 접근자 프로퍼티다.
+- 읽기 전용 접근자 프로퍼티에 값을 할당하면 아무런 에러 없이 무시된다.
+
+### 39.3.1 공백 텍스트 노드
+
+- HTML 요소 사이의 스페이스, 탭, 줄바꿈(개행)등의 공백 문자는 텍스트 노드를 생성한다. 이를 공백 텍스트 노드라 한다.
+- 따라서 노드를 탐색할 때는 공백 문자가 생성한 공백 텍스트 노드에 주의해야 한다.
+
+### 39.3.2 자식 노드 탐색
+
+## DOM 탐색 프로퍼티 비교
+
+| 프로퍼티                              | 설명                                                                                                                                                                                |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Node.prototype.childNodes`           | 자식 노드를 모두 탐색하여 DOM 컬렉션 객체인 NodeList에 담아 반환한다. `childNodes` 프로퍼티가 반환한 NodeList에는 **요소 노드뿐만 아니라 텍스트 노드도 포함**되어 있을 수 있다.     |
+| `Element.prototype.children`          | 자식 노드 중에서 **요소 노드만 모두 탐색**하여 DOM 컬렉션 객체인 HTMLCollection에 담아 반환한다. `children` 프로퍼티가 반환한 HTMLCollection에는 **텍스트 노드가 포함되지 않는다**. |
+| `Node.prototype.firstChild`           | 첫 번째 자식 노드를 반환한다. `firstChild` 프로퍼티가 반환한 노드는 **텍스트 노드이거나 요소 노드**다.                                                                              |
+| `Node.prototype.lastChild`            | 마지막 자식 노드를 반환한다. `lastChild` 프로퍼티가 반환한 노드는 **텍스트 노드이거나 요소 노드**다.                                                                                |
+| `Element.prototype.firstElementChild` | 첫 번째 자식 **요소 노드**를 반환한다. `firstElementChild` 프로퍼티는 **요소 노드만** 반환한다.                                                                                     |
+| `Element.prototype.lastElementChild`  | 마지막 자식 **요소 노드**를 반환한다. `lastElementChild` 프로퍼티는 **요소 노드만** 반환한다.                                                                                       |
+
+---
+
+### 39.3.3 자식 노드 존재 확인
+
+- 자식 노드가 존재하는지 확인하려면 Node.prototype.hasChildNodes 메서드를 사용한다.
