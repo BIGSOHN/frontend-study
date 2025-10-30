@@ -1,3 +1,15 @@
+// Firebase 모듈 임포트
+import {
+	db,
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	setDoc,
+	updateDoc,
+	increment,
+} from './firebase-config.js';
+
 // 전역 변수
 let foods = [];
 let restaurants = [];
@@ -5,8 +17,7 @@ let restaurants = [];
 // Firestore에서 음식 데이터 가져오기
 async function loadFoods() {
 	try {
-		const { collection, getDocs } = window.firestoreFunctions;
-		const foodsSnapshot = await getDocs(collection(window.db, 'foods'));
+		const foodsSnapshot = await getDocs(collection(db, 'foods'));
 		foods = [];
 		foodsSnapshot.forEach((doc) => {
 			foods.push(doc.data());
@@ -24,10 +35,7 @@ async function loadFoods() {
 // Firestore에서 식당 데이터 가져오기
 async function loadRestaurants() {
 	try {
-		const { collection, getDocs } = window.firestoreFunctions;
-		const restaurantsSnapshot = await getDocs(
-			collection(window.db, 'restaurants')
-		);
+		const restaurantsSnapshot = await getDocs(collection(db, 'restaurants'));
 		restaurants = [];
 		restaurantsSnapshot.forEach((doc) => {
 			restaurants.push(doc.data());
@@ -89,8 +97,7 @@ let gameState = {
 // Firestore에서 통계 가져오기
 async function getStats() {
 	try {
-		const { collection, doc, getDoc } = window.firestoreFunctions;
-		const statsRef = doc(window.db, 'statistics', 'global');
+		const statsRef = doc(db, 'statistics', 'global');
 		const statsDoc = await getDoc(statsRef);
 
 		if (statsDoc.exists()) {
@@ -140,8 +147,7 @@ function getStatsFromLocalStorage() {
 // Firestore에 통계 저장
 async function saveStats(stats) {
 	try {
-		const { doc, setDoc } = window.firestoreFunctions;
-		const statsRef = doc(window.db, 'statistics', 'global');
+		const statsRef = doc(db, 'statistics', 'global');
 		await setDoc(statsRef, stats);
 		// 동시에 로컬스토리지에도 저장
 		localStorage.setItem('food_worldcup_stats', JSON.stringify(stats));
@@ -155,8 +161,7 @@ async function saveStats(stats) {
 // 음식 선택 카운트 증가
 async function incrementSelectCount(foodId) {
 	try {
-		const { doc, updateDoc, increment } = window.firestoreFunctions;
-		const statsRef = doc(window.db, 'statistics', 'global');
+		const statsRef = doc(db, 'statistics', 'global');
 		await updateDoc(statsRef, {
 			[`foods.${foodId}.selectCount`]: increment(1),
 		});
@@ -168,8 +173,7 @@ async function incrementSelectCount(foodId) {
 // 우승 카운트 증가
 async function incrementWinCount(foodId) {
 	try {
-		const { doc, updateDoc, increment } = window.firestoreFunctions;
-		const statsRef = doc(window.db, 'statistics', 'global');
+		const statsRef = doc(db, 'statistics', 'global');
 		await updateDoc(statsRef, {
 			[`foods.${foodId}.winCount`]: increment(1),
 			totalGames: increment(1),
@@ -401,3 +405,9 @@ async function showStats() {
 
 	showScreen('stats-screen');
 }
+
+// HTML에서 호출할 수 있도록 전역 함수로 export
+window.startGame = startGame;
+window.selectFood = selectFood;
+window.showStats = showStats;
+window.showScreen = showScreen;

@@ -1,17 +1,633 @@
 # 📚 음식 월드컵 프로젝트 학습 가이드
 
 ## 목차
-1. [Firebase 관련 코드](#1-firebase-관련-코드)
-2. [JavaScript 기본 개념](#2-javascript-기본-개념)
-3. [LocalStorage](#3-localstorage)
-4. [게임 로직](#4-게임-로직)
-5. [에러 핸들링](#5-에러-핸들링)
-6. [HTML 변경사항](#6-html-변경사항)
-7. [학습 우선순위](#7-학습-우선순위)
+1. [ES6 모듈로 리팩토링 (2025-10-31)](#1-es6-모듈로-리팩토링-2025-10-31)
+2. [Firebase 관련 코드](#2-firebase-관련-코드)
+3. [Firebase 보안 (API 키)](#3-firebase-보안-api-키)
+4. [JavaScript 기본 개념](#4-javascript-기본-개념)
+5. [LocalStorage](#5-localstorage)
+6. [게임 로직](#6-게임-로직)
+7. [에러 핸들링](#7-에러-핸들링)
+8. [학습 우선순위](#8-학습-우선순위)
 
 ---
 
-## 1. Firebase 관련 코드
+## 1. ES6 모듈로 리팩토링 (2025-10-31)
+
+### 🎯 왜 리팩토링 했나?
+
+#### Before: window 객체 브릿지 패턴 (구버전)
+
+초기 코드는 ES6 모듈과 일반 스크립트를 혼합해서 사용했습니다:
+
+```html
+<!-- index.html -->
+<script type="module">
+    // ES6 모듈: Firebase 초기화
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+
+    // window 객체를 통한 브릿지
+    window.db = db;
+    window.firestoreFunctions = { collection, doc, getDoc, ... };
+</script>
+
+<!-- 일반 스크립트 -->
+<script src="script.js"></script>
+```
+
+```javascript
+// script.js (일반 스크립트)
+// window 객체에서 함수 가져오기
+const { collection, getDocs } = window.firestoreFunctions;
+const foodsSnapshot = await getDocs(collection(window.db, 'foods'));
+```
+
+**문제점**:
+- ❌ ES6 모듈과 일반 스크립트 혼재
+- ❌ window 객체 오염 (전역 스코프 사용)
+- ❌ 코드 중복 (index.html에 Firebase 초기화 코드 40줄)
+- ❌ 유지보수 어려움
+
+---
+
+#### After: 순수 ES6 모듈 (현재 버전)
+
+모든 스크립트를 ES6 모듈로 통일:
+
+```javascript
+// firebase-config.js (NEW!)
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, ... } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = { ... };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ES6 export
+export { db, collection, doc, getDoc, getDocs, setDoc, updateDoc, increment };
+```
+
+```javascript
+// script.js (ES6 모듈)
+// 직접 import
+import { db, collection, getDocs } from './firebase-config.js';
+
+// 깔끔하게 사용
+const foodsSnapshot = await getDocs(collection(db, 'foods'));
+```
+
+```html
+<!-- index.html (단순해짐!) -->
+<script type="module" src="script.js"></script>
+```
+
+**개선점**:
+- ✅ 모든 코드가 ES6 모듈로 통일
+- ✅ window 객체 사용 안 함 (깔끔한 스코프)
+- ✅ Firebase 설정을 별도 파일로 분리 (관심사 분리)
+- ✅ index.html이 간결해짐 (40줄 → 1줄)
+- ✅ 유지보수 쉬움
+
+---
+
+### 📁 파일 구조 변경
+
+#### Before
+```
+Ideal_food_WorldCup/
+├── index.html     # Firebase 초기화 코드 40줄 포함
+├── script.js      # 일반 스크립트 (window 객체 사용)
+└── style.css
+```
+
+#### After
+```
+Ideal_food_WorldCup/
+├── firebase-config.js  # NEW! Firebase 설정만 담당
+├── script.js           # ES6 모듈로 변경
+├── index.html          # 간소화 (1줄만 필요)
+└── style.css
+```
+
+---
+
+### 🔍 코드 비교
+
+#### 1. Firebase 초기화
+
+**Before (index.html)**:
+```javascript
+<script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import {
+        getFirestore,
+        collection,
+        doc,
+        getDoc,
+        getDocs,
+        setDoc,
+        updateDoc,
+        increment,
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+        apiKey: 'AIzaSyBHQAFiTUNFAk6XEDPo164isKbcqyrN_ls',
+        authDomain: 'foodidealworldcup.firebaseapp.com',
+        projectId: 'foodidealworldcup',
+        storageBucket: 'foodidealworldcup.firebasestorage.app',
+        messagingSenderId: '393852437251',
+        appId: '1:393852437251:web:5f9145604d0d63062a5f36',
+        measurementId: 'G-0SEHRJXXS1',
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 🔴 window 객체 오염
+    window.db = db;
+    window.firestoreFunctions = {
+        collection,
+        doc,
+        getDoc,
+        getDocs,
+        setDoc,
+        updateDoc,
+        increment,
+    };
+</script>
+```
+
+**After (firebase-config.js)**:
+```javascript
+// ES6 import
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import {
+    getFirestore,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    updateDoc,
+    increment,
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: 'AIzaSyBHQAFiTUNFAk6XEDPo164isKbcqyrN_ls',
+    authDomain: 'foodidealworldcup.firebaseapp.com',
+    projectId: 'foodidealworldcup',
+    storageBucket: 'foodidealworldcup.firebasestorage.app',
+    messagingSenderId: '393852437251',
+    appId: '1:393852437251:web:5f9145604d0d63062a5f36',
+    measurementId: 'G-0SEHRJXXS1',
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ✅ 깔끔한 ES6 export
+export { db, collection, doc, getDoc, getDocs, setDoc, updateDoc, increment };
+```
+
+---
+
+#### 2. script.js에서 Firebase 사용
+
+**Before (일반 스크립트)**:
+```javascript
+// 🔴 window 객체에서 가져오기
+async function loadFoods() {
+    const { collection, getDocs } = window.firestoreFunctions;
+    const foodsSnapshot = await getDocs(collection(window.db, 'foods'));
+    // ...
+}
+
+async function getStats() {
+    const { doc, getDoc } = window.firestoreFunctions;
+    const statsRef = doc(window.db, 'statistics', 'global');
+    // ...
+}
+
+async function incrementSelectCount(foodId) {
+    const { doc, updateDoc, increment } = window.firestoreFunctions;
+    const statsRef = doc(window.db, 'statistics', 'global');
+    // ...
+}
+```
+
+**After (ES6 모듈)**:
+```javascript
+// ✅ 최상단에서 한 번만 import
+import {
+    db,
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    setDoc,
+    updateDoc,
+    increment,
+} from './firebase-config.js';
+
+// 깔끔하게 사용
+async function loadFoods() {
+    const foodsSnapshot = await getDocs(collection(db, 'foods'));
+    // ...
+}
+
+async function getStats() {
+    const statsRef = doc(db, 'statistics', 'global');
+    const statsDoc = await getDoc(statsRef);
+    // ...
+}
+
+async function incrementSelectCount(foodId) {
+    const statsRef = doc(db, 'statistics', 'global');
+    await updateDoc(statsRef, {
+        [`foods.${foodId}.selectCount`]: increment(1),
+    });
+}
+```
+
+**차이점**:
+- Before: 매 함수마다 `window.firestoreFunctions`에서 꺼내옴
+- After: 파일 최상단에서 한 번만 import, 모든 함수에서 바로 사용
+
+---
+
+#### 3. HTML 파일 로드
+
+**Before**:
+```html
+<!-- 40줄의 Firebase 초기화 코드 -->
+<script type="module">
+    // ... Firebase imports
+    // ... Firebase config
+    // ... window 객체 export
+</script>
+
+<!-- 일반 스크립트 로드 -->
+<script src="script.js"></script>
+```
+
+**After**:
+```html
+<!-- 단 1줄! -->
+<script type="module" src="script.js"></script>
+```
+
+---
+
+#### 4. 전역 함수 노출 (HTML onclick 속성용)
+
+ES6 모듈은 기본적으로 스코프가 격리되어 있어서, HTML의 `onclick="startGame()"`이 작동하지 않습니다.
+
+**해결 방법**: script.js 맨 아래에 추가
+
+```javascript
+// HTML에서 호출할 수 있도록 전역 함수로 export
+window.startGame = startGame;
+window.selectFood = selectFood;
+window.showStats = showStats;
+window.showScreen = showScreen;
+```
+
+**HTML에서 사용**:
+```html
+<button onclick="startGame()">시작하기</button>
+<button onclick="showStats()">통계 보기</button>
+<div onclick="selectFood('left')">...</div>
+```
+
+---
+
+### 📚 ES6 모듈 vs 일반 스크립트
+
+#### 일반 스크립트 (`<script src="script.js">`)
+
+```html
+<script src="script.js"></script>
+```
+
+**특징**:
+- ❌ `import/export` 사용 불가
+- ✅ 모든 변수가 전역 스코프 (window 객체에 자동 추가)
+- ✅ HTML `onclick` 속성에서 함수 바로 호출 가능
+- ❌ 이름 충돌 위험
+- ❌ 의존성 관리 어려움
+
+**예시**:
+```javascript
+// script.js (일반 스크립트)
+function startGame() { ... }  // 자동으로 window.startGame이 됨
+const db = ...;  // 전역 변수
+```
+
+```html
+<button onclick="startGame()">시작</button>  <!-- 작동함 -->
+```
+
+---
+
+#### ES6 모듈 (`<script type="module">`)
+
+```html
+<script type="module" src="script.js"></script>
+```
+
+**특징**:
+- ✅ `import/export` 사용 가능
+- ✅ 각 모듈은 독립적인 스코프 (격리됨)
+- ❌ HTML `onclick`에서 함수 직접 호출 불가
+- ✅ 이름 충돌 방지
+- ✅ 의존성 관리 명확
+- ✅ 현대 JavaScript 표준
+
+**예시**:
+```javascript
+// script.js (ES6 모듈)
+import { db } from './firebase-config.js';
+
+function startGame() { ... }  // 전역에 노출 안 됨
+
+// 명시적으로 전역에 노출
+window.startGame = startGame;
+```
+
+```html
+<button onclick="startGame()">시작</button>  <!-- window.startGame 덕분에 작동 -->
+```
+
+---
+
+### 🔍 왜 window 객체가 필요했나?
+
+#### 문제: ES6 모듈과 일반 스크립트 간 데이터 공유
+
+```html
+<!-- index.html -->
+<script type="module">
+    import { getFirestore } from '...';
+    const db = getFirestore();
+
+    // 🤔 이 db를 script.js에서 어떻게 사용할까?
+</script>
+
+<script src="script.js"></script>  <!-- type="module" 없음 -->
+```
+
+#### 해결: window 객체 브릿지
+
+```javascript
+// index.html의 ES6 모듈
+window.db = db;  // window 객체에 저장
+```
+
+```javascript
+// script.js (일반 스크립트)
+const db = window.db;  // window에서 꺼내 사용
+```
+
+#### 근본 해결: 모두 ES6 모듈로
+
+```javascript
+// firebase-config.js
+export const db = getFirestore();
+```
+
+```javascript
+// script.js
+import { db } from './firebase-config.js';
+```
+
+→ **window 객체 없이 깔끔하게 데이터 공유!**
+
+---
+
+### 💡 왜 ES6 모듈이 더 좋은가?
+
+#### 1. 명확한 의존성
+
+**일반 스크립트**:
+```html
+<!-- 순서가 중요함! -->
+<script src="firebase-init.js"></script>
+<script src="script.js"></script>  <!-- firebase-init.js가 먼저 실행되어야 함 -->
+```
+
+**ES6 모듈**:
+```javascript
+// 의존성이 코드에 명시됨
+import { db } from './firebase-config.js';  // 자동으로 먼저 로드됨
+```
+
+---
+
+#### 2. 네임스페이스 오염 방지
+
+**일반 스크립트**:
+```javascript
+// script1.js
+var data = [1, 2, 3];  // 전역 변수
+
+// script2.js
+var data = [4, 5, 6];  // 🔴 충돌! script1의 data가 덮어써짐
+```
+
+**ES6 모듈**:
+```javascript
+// script1.js
+const data = [1, 2, 3];  // 모듈 스코프
+
+// script2.js
+const data = [4, 5, 6];  // ✅ 충돌 없음! 각자 독립된 스코프
+```
+
+---
+
+#### 3. 코드 재사용성
+
+**일반 스크립트**:
+```javascript
+// 다른 프로젝트에서 사용하려면?
+// → 전체 HTML 파일을 복사해야 함
+```
+
+**ES6 모듈**:
+```javascript
+// firebase-config.js는 어떤 프로젝트에서나 재사용 가능
+import { db } from './firebase-config.js';
+```
+
+---
+
+#### 4. 트리 쉐이킹 (Tree Shaking)
+
+빌드 도구(Webpack, Vite)는 ES6 모듈에서 **사용하지 않는 코드를 자동 제거**합니다.
+
+**ES6 모듈**:
+```javascript
+// firebase-config.js
+export { db, collection, doc, getDoc, getDocs, setDoc, updateDoc, increment };
+
+// script.js
+import { db, collection, getDocs } from './firebase-config.js';
+// → setDoc, updateDoc, increment는 빌드 시 제거됨 (사용 안 함)
+```
+
+**일반 스크립트**: 트리 쉐이킹 불가
+
+---
+
+### 📖 학습 포인트
+
+#### 1. ES6 모듈의 스코프
+
+```javascript
+// module1.js
+const secret = 'password123';  // 외부에서 접근 불가
+export const public = 'hello';  // export해야 외부에서 사용 가능
+
+// module2.js
+import { public } from './module1.js';
+console.log(public);   // ✅ 'hello'
+console.log(secret);   // ❌ ReferenceError
+```
+
+---
+
+#### 2. export 방식
+
+**Named Export (우리가 사용)**:
+```javascript
+// firebase-config.js
+export const db = getFirestore();
+export const collection = ...;
+
+// script.js
+import { db, collection } from './firebase-config.js';
+```
+
+**Default Export**:
+```javascript
+// firebase-config.js
+const db = getFirestore();
+export default db;
+
+// script.js
+import db from './firebase-config.js';  // 이름은 자유롭게
+```
+
+**언제 사용?**
+- Named Export: 여러 개 export (우리 경우: db, collection, doc, ...)
+- Default Export: 하나만 export (예: React 컴포넌트)
+
+---
+
+#### 3. 상대 경로 vs 절대 경로
+
+```javascript
+// ✅ 상대 경로 (우리가 사용)
+import { db } from './firebase-config.js';  // 같은 폴더
+
+// ✅ 상대 경로
+import { db } from '../config/firebase-config.js';  // 상위 폴더
+
+// ✅ CDN (절대 경로)
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+
+// ❌ 잘못된 경로 (npm 패키지처럼 보임)
+import { db } from 'firebase-config.js';  // 오류!
+```
+
+**규칙**:
+- 같은 프로젝트 파일: `./` 또는 `../` 필수
+- CDN: `https://` 전체 URL
+- npm 패키지: 패키지명만 (예: `import React from 'react'`)
+
+---
+
+### 🎯 리팩토링 체크리스트
+
+#### ✅ 완료한 것
+
+1. **firebase-config.js 생성**
+   - Firebase 초기화 코드 분리
+   - `db` 및 Firestore 함수 export
+
+2. **script.js ES6 모듈로 변경**
+   - 최상단에 `import` 추가
+   - 모든 `window.firestoreFunctions` 제거
+   - 모든 `window.db` → `db`로 변경
+
+3. **index.html 간소화**
+   - 40줄 Firebase 코드 제거
+   - `<script type="module" src="script.js"></script>` 한 줄만 남김
+
+4. **전역 함수 노출**
+   - HTML `onclick` 속성을 위해 `window.startGame` 등 추가
+
+---
+
+### 🚀 다음 단계 (선택사항)
+
+#### 1. 더 세분화된 모듈
+
+```javascript
+// firebase/config.js
+export { db };
+
+// firebase/foods.js
+import { db } from './config.js';
+export async function loadFoods() { ... }
+
+// firebase/stats.js
+import { db } from './config.js';
+export async function getStats() { ... }
+
+// script.js
+import { loadFoods } from './firebase/foods.js';
+import { getStats } from './firebase/stats.js';
+```
+
+---
+
+#### 2. TypeScript로 변환
+
+```typescript
+// firebase-config.ts
+import { Firestore } from 'firebase/firestore';
+
+export const db: Firestore = getFirestore(app);
+```
+
+---
+
+#### 3. 빌드 도구 사용 (Vite, Webpack)
+
+```bash
+# npm으로 Firebase 설치
+npm install firebase
+
+# CDN URL 대신 npm 패키지 사용
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+```
+
+---
+
+### 📚 참고 자료
+
+- [MDN - JavaScript modules](https://developer.mozilla.org/ko/docs/Web/JavaScript/Guide/Modules)
+- [MDN - import](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/import)
+- [MDN - export](https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/export)
+- [JavaScript.info - Modules](https://ko.javascript.info/modules-intro)
+
+---
+
+## 2. Firebase 관련 코드
 
 ### 🔍 Firebase 공식문서 보는 법
 
@@ -360,11 +976,208 @@ async function saveStats(stats) {
 
 ---
 
-## 2. JavaScript 기본 개념
+## 3. Firebase 보안 (API 키)
+
+### 🔐 Firebase API 키는 공개해도 괜찮습니다!
+
+이 프로젝트의 `index.html`에는 Firebase 설정이 포함되어 있습니다:
+
+```javascript
+const firebaseConfig = {
+    apiKey: 'AIzaSyBHQAFiTUNFAk6XEDPo164isKbcqyrN_ls',
+    authDomain: 'foodidealworldcup.firebaseapp.com',
+    projectId: 'foodidealworldcup',
+    storageBucket: 'foodidealworldcup.firebasestorage.app',
+    messagingSenderId: '393852437251',
+    appId: '1:393852437251:web:5f9145604d0d63062a5f36',
+    measurementId: 'G-0SEHRJXXS1',
+};
+```
+
+**이것은 의도된 것이며 안전합니다.** ✅
+
+---
+
+### 왜 공개해도 괜찮을까?
+
+#### 1. Firebase Web API 키 = 공개용 식별자
+
+Firebase Web API 키는:
+- ✅ **공개용 식별자**입니다 (비밀 키가 아님)
+- ✅ 브라우저에서 사용하도록 설계됨
+- ✅ GitHub, 블로그에 공개해도 괜찮음
+- ✅ Firebase 공식 문서에서도 인정한 방식
+
+#### 2. 어차피 브라우저에서 보임
+
+사용자의 브라우저에서 다 보입니다:
+```bash
+# Chrome DevTools → Network 탭
+# Firebase API 호출 URL에 모두 노출됨
+https://firestore.googleapis.com/v1/projects/foodidealworldcup/databases/(default)/documents/foods
+```
+
+→ **숨길 방법이 없습니다!**
+
+#### 3. Firebase의 설계 철학
+
+```
+❌ 전통적인 방식:
+[브라우저] → [백엔드 서버 + 비밀키] → [데이터베이스]
+
+✅ Firebase 방식:
+[브라우저 + 공개키] → [Firebase + Security Rules] → [데이터베이스]
+```
+
+Firebase는 **클라이언트에서 직접 연결**하도록 설계되었습니다.
+
+---
+
+### 각 필드 설명
+
+| 필드 | 공개 가능? | 설명 |
+|------|----------|------|
+| `apiKey` | ✅ | Firebase 프로젝트 식별자 |
+| `authDomain` | ✅ | 인증 도메인 (공개 URL) |
+| `projectId` | ✅ | 프로젝트 ID (공개 정보) |
+| `storageBucket` | ✅ | 스토리지 버킷 (공개 URL) |
+| `messagingSenderId` | ✅ | 푸시 알림 발신자 ID |
+| `appId` | ✅ | 앱 식별자 |
+| `measurementId` | ✅ | Google Analytics ID |
+
+**결론: 전부 공개해도 괜찮습니다!** ✅
+
+---
+
+### 🛡️ 진짜 보안은 어디서?
+
+#### Firestore Security Rules
+
+실제 보안은 **Firestore Security Rules**로 제어합니다:
+
+```javascript
+// Firebase Console → Firestore Database → 규칙(Rules)
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 음식 데이터: 모두 읽기 가능, 쓰기 불가
+    match /foods/{foodId} {
+      allow read: if true;           // 누구나 읽기 가능
+      allow write: if false;          // 아무도 수정 못함
+    }
+
+    // 식당 데이터: 모두 읽기 가능, 쓰기 불가
+    match /restaurants/{restaurantId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 통계 데이터: 읽기/쓰기 허용
+    match /statistics/{statId} {
+      allow read: if true;
+      allow update: if true;
+      allow create: if true;
+    }
+  }
+}
+```
+
+#### Firebase Authentication (필요시)
+
+로그인 기능 추가 시:
+```javascript
+// 로그인한 사용자만 접근
+allow write: if request.auth != null;
+
+// 본인 데이터만 수정
+allow write: if request.auth.uid == userId;
+```
+
+#### Firebase App Check (선택사항)
+
+봇 차단 및 앱 검증:
+```javascript
+// 등록된 앱에서만 접근 허용
+```
+
+---
+
+### ❌ 절대 공개하면 안 되는 것
+
+#### Service Account 키 (서버용 비밀 키)
+
+```json
+{
+  "type": "service_account",
+  "project_id": "...",
+  "private_key_id": "...",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n...",  // ❌ 절대 공개 금지!
+  "client_email": "...",
+  ...
+}
+```
+
+#### Database Secret (Realtime Database)
+
+```javascript
+const databaseURL = "https://...firebaseio.com/?auth=SECRET_KEY"  // ❌ 절대 공개 금지!
+```
+
+#### Admin SDK 키
+
+```javascript
+// 서버에서만 사용, 절대 클라이언트에 노출 금지
+const admin = require('firebase-admin');
+const serviceAccount = require('./serviceAccountKey.json');  // ❌ 비밀!
+```
+
+---
+
+### 📊 실제 사례
+
+유명한 Firebase 사용 사이트들도 API 키가 공개되어 있습니다:
+
+**예시**: GitHub에서 "firebase config" 검색
+- 수천 개의 오픈소스 프로젝트가 API 키를 그대로 공개
+- Google, Airbnb 등 대기업도 Web API 키는 공개
+
+---
+
+### 🎯 보안 체크리스트
+
+#### ✅ 우리가 한 것 (안전함)
+- Firebase Web API 키 공개
+- `firebaseConfig` 객체 공개
+- GitHub 퍼블릭 레포에 업로드
+
+#### ⚠️ 확인해야 할 것
+- [ ] Firestore Security Rules 설정했나요?
+- [ ] 쓰기 권한을 적절히 제한했나요?
+- [ ] 사용량 모니터링하고 있나요?
+
+#### ❌ 하면 안 되는 것
+- Service Account 키를 Git에 커밋
+- Database Secret을 코드에 하드코딩
+- Admin SDK 키를 클라이언트에 노출
+
+---
+
+### 📚 참고 자료
+
+**Firebase 공식 문서**:
+- [API Keys for Firebase](https://firebase.google.com/docs/projects/api-keys)
+- [Firestore Security Rules](https://firebase.google.com/docs/firestore/security/get-started)
+
+**핵심 메시지**:
+> "Web API keys for Firebase are different from typical API secrets. They don't need to be hidden and can be publicly accessible."
+
+---
+
+## 4. JavaScript 기본 개념
 
 ### ✅ 반드시 이해해야 할 부분
 
-#### 2.1 async/await - 비동기 처리
+#### 3.1 async/await - 비동기 처리
 ```javascript
 // script.js:6
 async function loadFoods() {
@@ -397,7 +1210,7 @@ async function loadFoods() {
 
 ---
 
-#### 2.2 배열 셔플 (Fisher-Yates 알고리즘)
+#### 3.2 배열 셔플 (Fisher-Yates 알고리즘)
 ```javascript
 // script.js:183-190
 function shuffle(array) {
@@ -442,7 +1255,7 @@ const newArray = [...array]; // ['A', 'B', 'C', 'D']
 
 ---
 
-#### 2.3 DOM 조작 - 화면 전환
+#### 3.3 DOM 조작 - 화면 전환
 ```javascript
 // script.js:193-198
 function showScreen(screenId) {
@@ -475,7 +1288,7 @@ function showScreen(screenId) {
 
 ---
 
-#### 2.4 이벤트 리스너 - 페이지 로드 시 실행
+#### 3.4 이벤트 리스너 - 페이지 로드 시 실행
 ```javascript
 // script.js:201-213
 window.addEventListener('DOMContentLoaded', async () => {
@@ -504,7 +1317,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 ---
 
-#### 2.5 배열 메서드 - 객체 변환 및 정렬
+#### 3.5 배열 메서드 - 객체 변환 및 정렬
 ```javascript
 // script.js:362
 const foodsArray = Object.values(stats.foods);
@@ -532,7 +1345,7 @@ const foodsArray = Object.values(stats.foods);
 
 ---
 
-#### 2.6 배열 메서드 체이닝 - 정렬 및 슬라이스
+#### 3.6 배열 메서드 체이닝 - 정렬 및 슬라이스
 ```javascript
 // script.js:368-370
 const topWinners = foodsArray
@@ -571,7 +1384,7 @@ const top2 = foods
 
 ---
 
-#### 2.7 동적 HTML 생성
+#### 3.7 동적 HTML 생성
 ```javascript
 // script.js:330-338
 const item = document.createElement('div');
@@ -606,7 +1419,7 @@ item.appendChild(span);
 
 ---
 
-#### 2.8 조건(삼항) 연산자
+#### 3.8 조건(삼항) 연산자
 ```javascript
 // script.js:260
 const selectedIndex = gameState.matchIndex * 2 + (side === 'left' ? 0 : 1);
@@ -630,7 +1443,7 @@ if (side === 'left') {
 
 ---
 
-## 3. LocalStorage
+## 5. LocalStorage
 
 ### 브라우저 저장소 사용
 ```javascript
@@ -685,7 +1498,7 @@ function getStatsFromLocalStorage() {
 
 ---
 
-## 4. 게임 로직
+## 6. 게임 로직
 
 ### 직접 설계한 부분 (비즈니스 로직)
 
@@ -822,7 +1635,7 @@ function nextRound() {
 
 ---
 
-## 5. 에러 핸들링
+## 7. 에러 핸들링
 
 ### try-catch와 Fallback 전략
 ```javascript
@@ -873,87 +1686,30 @@ function getFallbackFoods() {
 
 ---
 
-## 6. HTML 변경사항
-
-### `index.html` 수정 내역
-
-#### 변경 1: Firebase import에 `getDocs` 추가
-```diff
-// index.html:91-100
-import {
-    getFirestore,
-    collection,
-    doc,
-    getDoc,
-+   getDocs,  // ← 추가
-    setDoc,
-    updateDoc,
-    increment,
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-```
-
-#### 변경 2: window 객체에 `getDocs` export 추가
-```diff
-// index.html:119-127
-window.firestoreFunctions = {
-    collection,
-    doc,
-    getDoc,
-+   getDocs,  // ← 추가
-    setDoc,
-    updateDoc,
-    increment,
-};
-```
-
-### 왜 추가했나?
-
-`script.js`에서 `getDocs()`를 사용하기 때문입니다:
-- `script.js:8` - `const { collection, getDocs } = window.firestoreFunctions;`
-- `script.js:28` - `const { collection, getDocs } = window.firestoreFunctions;`
-
-### `getDoc()` vs `getDocs()` 차이점
-
-| 함수 | 용도 | 반환값 | 사용 위치 |
-|------|------|--------|-----------|
-| `getDoc()` | 단일 문서 읽기 | DocumentSnapshot | `script.js:94` (통계 문서) |
-| `getDocs()` | 컬렉션 전체 읽기 | QuerySnapshot | `script.js:9` (음식 컬렉션) |
-
-**예시**:
-```javascript
-// getDoc() - 단일 문서
-const docRef = doc(db, 'statistics', 'global');
-const docSnap = await getDoc(docRef);
-console.log(docSnap.data());  // { totalGames: 100, foods: {...} }
-
-// getDocs() - 컬렉션 전체
-const colRef = collection(db, 'foods');
-const querySnap = await getDocs(colRef);
-querySnap.forEach((doc) => {
-    console.log(doc.data());  // { id: 1, name: '돼지찌개', ... }
-});
-```
-
----
-
-## 7. 학습 우선순위
+## 8. 학습 우선순위
 
 ### 🔴 필수 (반드시 이해)
 
-1. **async/await** - 비동기 처리의 핵심
+1. **ES6 모듈** - 현대 JavaScript의 기본 ⭐ NEW!
+   - `import/export` 문법
+   - 모듈 스코프와 격리
+   - Named vs Default Export
+   - 상대/절대 경로
+
+2. **async/await** - 비동기 처리의 핵심
    - 모든 Firebase 함수가 비동기
    - 순서가 중요한 작업 처리
 
-2. **DOM 조작** - 프론트엔드의 기본
+3. **DOM 조작** - 프론트엔드의 기본
    - `querySelector`, `getElementById`
    - `classList`, `innerHTML`, `textContent`
    - `addEventListener`
 
-3. **배열 메서드** - 데이터 처리
+4. **배열 메서드** - 데이터 처리
    - `map`, `filter`, `sort`, `slice`
    - `forEach`, `push`, `pop`
 
-4. **이벤트 리스너** - 사용자 상호작용
+5. **이벤트 리스너** - 사용자 상호작용
    - `DOMContentLoaded`
    - `onclick`, `addEventListener`
 
@@ -961,32 +1717,32 @@ querySnap.forEach((doc) => {
 
 ### 🟡 중요 (Firebase 사용 시)
 
-5. **Firestore CRUD** - 데이터베이스 조작
+6. **Firestore CRUD** - 데이터베이스 조작
    - Create: `setDoc()`
    - Read: `getDoc()`, `getDocs()`
    - Update: `updateDoc()`, `increment()`
    - Delete: (이 프로젝트에서는 미사용)
 
-6. **Firebase 초기화** - 설정 및 연결
+7. **Firebase 초기화** - 설정 및 연결
    - `initializeApp()`
    - `getFirestore()`
-   - ES6 모듈 import
+   - firebase-config.js 모듈 패턴
 
 ---
 
 ### 🟢 선택 (심화)
 
-7. **에러 핸들링** - 안정성 향상
+8. **에러 핸들링** - 안정성 향상
    - `try-catch`
    - Fallback 전략
 
-8. **LocalStorage** - 브라우저 저장소
+9. **LocalStorage** - 브라우저 저장소
    - `getItem()`, `setItem()`
    - `JSON.stringify()`, `JSON.parse()`
 
-9. **알고리즘** - 로직 구현
-   - Fisher-Yates 셔플
-   - 토너먼트 구조
+10. **알고리즘** - 로직 구현
+    - Fisher-Yates 셔플
+    - 토너먼트 구조
 
 ---
 
@@ -1010,15 +1766,20 @@ querySnap.forEach((doc) => {
 ---
 
 ### 난이도 2: 간단한 수정
-1. **Firebase 없이 동작**
+1. **ES6 모듈 연습** ⭐ NEW!
+   - `firebase-config.js`에 `console.log('Firebase 초기화')` 추가
+   - `script.js`에서 import하는 함수 순서 바꿔보기
+   - Named Export를 Default Export로 변경해보기
+
+2. **Firebase 없이 동작**
    - `loadFoods()`에서 항상 `getFallbackFoods()` 반환
    - Firestore 호출 주석 처리
 
-2. **데이터 변경**
+3. **데이터 변경**
    - `getFallbackFoods()`의 음식 목록 수정
    - 이미지 URL 변경
 
-3. **스타일 변경**
+4. **스타일 변경**
    - `style.css`에서 색상, 폰트 변경
    - 버튼 디자인 커스터마이징
 
@@ -1041,7 +1802,12 @@ querySnap.forEach((doc) => {
 ---
 
 ### 난이도 4: 리팩토링
-1. **컴포넌트화**
+1. **ES6 모듈 더 세분화** ⭐ NEW!
+   - `game.js`: 게임 로직만 분리
+   - `ui.js`: DOM 조작만 분리
+   - `firebase/foods.js`, `firebase/stats.js`: Firebase 함수 분리
+
+2. **컴포넌트화**
    - 식당 카드를 함수로 분리
    ```javascript
    function createRestaurantCard(restaurant) {
@@ -1052,7 +1818,7 @@ querySnap.forEach((doc) => {
    }
    ```
 
-2. **상태 관리 개선**
+3. **상태 관리 개선**
    - `gameState`를 클래스로 관리
    ```javascript
    class GameState {
@@ -1064,10 +1830,6 @@ querySnap.forEach((doc) => {
        nextRound() { ... }
    }
    ```
-
-3. **모듈화**
-   - 파일 분리: `firebase.js`, `game.js`, `ui.js`
-   - ES6 모듈로 import/export
 
 ---
 
