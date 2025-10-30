@@ -79,7 +79,7 @@
 
 #### 성능 요구사항
 
-- 선택 후 다음 화면 전환 : 속도 어느저도?
+- 선택 후 다음 화면 전환 : 속도 어느정도도?
 - 확장자 webp
 
 ### 근처 식당 목록 표시
@@ -179,7 +179,7 @@
 
 ### 식당 종류
 
-- 돼지찌개 : 육천 돼지찌개
+- 돼지찌개 : 육천 돼지찌개, 진량 돼지찌개
 - 국밥 : 대호돼지국밥, 일품돼지국밥
 - 짜장면 : 왕가네찬팅, 우당탕반점
 - 갈비탕 : 청학골 한방 갈비탕
@@ -188,10 +188,37 @@
 - 샌드위치 : 서브웨이
 - 삼겹살 : 무한폭식, 환도네
 - 돈까스 : 카츠데이, 역전우동
-- 치킨 : 맘스터치
+- 치킨 : 맘스터치, 닭동가리
 - 햄버거 : 맘스터치, 버거킹
 - 파스타 : 미즈 컨테이너, 퀴다
-- 덮밥 : 덮덮밥
+- 덮밥 : 덮덮밥, 타이요
 - 석쇠불고기 : 홍대불고기
 - 닭갈비 : 일미 닭갈비
 - 우동 : 삼동소바, 역전우동
+
+### URL들 (네이버 지도)
+
+- 육천 돼지찌개 <https://map.naver.com/p/entry/place/1866129911?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302223&locale=ko&svcName=map_pcv5>
+- 진량 돼지찌개 <https://map.naver.com/p/entry/place/15207819?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302223&locale=ko&svcName=map_pcv5>
+- 대호돼지국밥 <https://map.naver.com/p/entry/place/15219029?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302224&locale=ko&svcName=map_pcv5>
+- 일품돼지국밥 <https://map.naver.com/p/entry/place/1553361584?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302224&locale=ko&svcName=map_pcv5>
+- 왕가네찬팅 <https://map.naver.com/p/entry/place/13100598?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302224&locale=ko&svcName=map_pcv5>
+- 우당탕반점 <https://map.naver.com/p/entry/place/15214401?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302224&locale=ko&svcName=map_pcv5>
+- 청학골 한방 갈비탕 <https://map.naver.com/p/entry/place/15206391?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302224&locale=ko&svcName=map_pcv5>
+- 쪼닭 <https://map.naver.com/p/entry/place/1098302881?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302224&locale=ko&svcName=map_pcv5>
+- 엘브리또 <https://map.naver.com/p/entry/place/1411548640?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302225&locale=ko&svcName=map_pcv5>
+- 서브웨이 <https://map.naver.com/p/entry/place/1078583378?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302225&locale=ko&svcName=map_pcv5>
+- 무한폭식 <https://map.naver.com/p/entry/place/1123373941?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302225&locale=ko&svcName=map_pcv5>
+- 환도네 <https://map.naver.com/p/entry/place/1527540489?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302225&locale=ko&svcName=map_pcv5>
+- 카츠데이 <https://map.naver.com/p/entry/place/1002667908?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302225&locale=ko&svcName=map_pcv5>
+- 역전우동 <https://map.naver.com/p/entry/place/2011185323?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302225&locale=ko&svcName=map_pcv5>
+- 맘스터치 <https://map.naver.com/p/entry/place/1841379825?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302226&locale=ko&svcName=map_pcv5>
+- 닭동가리 <https://map.naver.com/p/entry/place/1928792415?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302226&locale=ko&svcName=map_pcv5>
+- 버거킹 <https://map.naver.com/p/entry/place/207887138?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302226&locale=ko&svcName=map_pcv5>
+- 미즈컨테이너 <https://map.naver.com/p/entry/place/1718662630?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302226&locale=ko&svcName=map_pcv5>
+- 퀴다 <https://map.naver.com/p/entry/place/1480660258?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302221&locale=ko&svcName=map_pcv5>
+- 덮덮밥 <https://map.naver.com/p/entry/place/1643218077?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302226&locale=ko&svcName=map_pcv5>
+- 타이요 <https://map.naver.com/p/entry/place/1957331368?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302227&locale=ko&svcName=map_pcv5>
+- 홍대불고기 <https://map.naver.com/p/entry/place/38562994?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302227&locale=ko&svcName=map_pcv5>
+- 일미 닭갈비 <https://map.naver.com/p/entry/place/1798439427?c=14.83,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302227&locale=ko&svcName=map_pcv5>
+- 삼동소바 <https://map.naver.com/p/entry/place/1580626893?c=14.83,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202510302227&locale=ko&svcName=map_pcv5>

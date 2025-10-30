@@ -1,173 +1,81 @@
-// 음식 데이터
-const foods = [
-	{ id: 1, name: '돼지찌개', category: '한식', image: 'images/돼지찌개.jpg' },
-	{ id: 2, name: '국밥', category: '한식', image: 'images/국밥.jpg' },
-	{ id: 3, name: '짜장면', category: '중식', image: 'images/짜장면.jpg' },
-	{ id: 4, name: '갈비탕', category: '한식', image: 'images/갈비탕.jpg' },
-	{ id: 5, name: '찜닭', category: '한식', image: 'images/찜닭.jpg' },
-	{ id: 6, name: '브리또', category: '양식', image: 'images/브리또.jpg' },
-	{ id: 7, name: '샌드위치', category: '양식', image: 'images/샌드위치.jpg' },
-	{ id: 8, name: '삼겹살', category: '한식', image: 'images/삼겹살.jpg' },
-	{ id: 9, name: '돈까스', category: '일식', image: 'images/돈까스.jpg' },
-	{ id: 10, name: '치킨', category: '양식', image: 'images/치킨.jpg' },
-	{ id: 11, name: '햄버거', category: '양식', image: 'images/햄버거.jpg' },
-	{ id: 12, name: '파스타', category: '양식', image: 'images/파스타.jpg' },
-	{ id: 13, name: '덮밥', category: '일식', image: 'images/덮밥.jpg' },
-	{ id: 14, name: '우동', category: '일식', image: 'images/우동.jpg' },
-	{
-		id: 15,
-		name: '석쇠불고기',
-		category: '한식',
-		image: 'images/석쇠불고기.jpg',
-	},
-	{ id: 16, name: '닭갈비', category: '한식', image: 'images/닭갈비.jpg' },
-];
+// 전역 변수
+let foods = [];
+let restaurants = [];
 
-// 식당 데이터 (42 경산 근처)
-const restaurants = {
-	돼지찌개: [
+// Firestore에서 음식 데이터 가져오기
+async function loadFoods() {
+	try {
+		const { collection, getDocs } = window.firestoreFunctions;
+		const foodsSnapshot = await getDocs(collection(window.db, 'foods'));
+		foods = [];
+		foodsSnapshot.forEach((doc) => {
+			foods.push(doc.data());
+		});
+		foods.sort((a, b) => a.id - b.id); // ID 순으로 정렬
+		console.log('음식 데이터 로드 완료:', foods.length);
+		return foods;
+	} catch (error) {
+		console.error('음식 데이터 로드 실패:', error);
+		// Fallback: 기본 데이터 사용
+		return getFallbackFoods();
+	}
+}
+
+// Firestore에서 식당 데이터 가져오기
+async function loadRestaurants() {
+	try {
+		const { collection, getDocs } = window.firestoreFunctions;
+		const restaurantsSnapshot = await getDocs(
+			collection(window.db, 'restaurants')
+		);
+		restaurants = [];
+		restaurantsSnapshot.forEach((doc) => {
+			restaurants.push(doc.data());
+		});
+		console.log('식당 데이터 로드 완료:', restaurants.length);
+		return restaurants;
+	} catch (error) {
+		console.error('식당 데이터 로드 실패:', error);
+		return [];
+	}
+}
+
+// Fallback 음식 데이터
+function getFallbackFoods() {
+	return [
 		{
-			name: '돼지찌개 전문점',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20돼지찌개',
+			id: 1,
+			name: '돼지찌개',
+			category: '한식',
+			image: 'images/돼지찌개.webp',
 		},
+		{ id: 2, name: '국밥', category: '한식', image: 'images/국밥.webp' },
+		{ id: 3, name: '짜장면', category: '중식', image: 'images/짜장면.webp' },
+		{ id: 4, name: '갈비탕', category: '한식', image: 'images/갈비탕.webp' },
+		{ id: 5, name: '찜닭', category: '한식', image: 'images/찜닭.webp' },
+		{ id: 6, name: '브리또', category: '양식', image: 'images/브리또.webp' },
 		{
-			name: '한식당',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20한식당',
+			id: 7,
+			name: '샌드위치',
+			category: '양식',
+			image: 'images/샌드위치.webp',
 		},
-	],
-	국밥: [
-		{ name: '국밥집', mapUrl: 'https://map.naver.com/p/search/42경산%20국밥' },
+		{ id: 8, name: '삼겹살', category: '한식', image: 'images/삼겹살.webp' },
+		{ id: 9, name: '돈까스', category: '일식', image: 'images/돈까스.webp' },
+		{ id: 10, name: '치킨', category: '양식', image: 'images/치킨.webp' },
+		{ id: 11, name: '햄버거', category: '양식', image: 'images/햄버거.webp' },
+		{ id: 12, name: '파스타', category: '양식', image: 'images/파스타.webp' },
+		{ id: 13, name: '덮밥', category: '일식', image: 'images/덮밥.webp' },
+		{ id: 14, name: '우동', category: '일식', image: 'images/우동.webp' },
 		{
-			name: '24시 국밥',
-			mapUrl: 'https://map.naver.com/p/search/42경산%2024시국밥',
+			id: 15,
+			name: '석쇠불고기',
+			category: '한식',
+			image: 'images/석쇠불고기.webp',
 		},
-	],
-	짜장면: [
-		{
-			name: '중국집',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20중국집',
-		},
-		{
-			name: '짜장면 맛집',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20짜장면',
-		},
-	],
-	갈비탕: [
-		{
-			name: '갈비탕집',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20갈비탕',
-		},
-		{
-			name: '한식당',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20한식당',
-		},
-	],
-	찜닭: [
-		{ name: '찜닭집', mapUrl: 'https://map.naver.com/p/search/42경산%20찜닭' },
-		{
-			name: '안동찜닭',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20안동찜닭',
-		},
-	],
-	브리또: [
-		{
-			name: '멕시칸 레스토랑',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20브리또',
-		},
-		{
-			name: '타코벨',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20타코벨',
-		},
-	],
-	샌드위치: [
-		{
-			name: '서브웨이',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20서브웨이',
-		},
-		{
-			name: '샌드위치 카페',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20샌드위치',
-		},
-	],
-	삼겹살: [
-		{
-			name: '삼겹살집',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20삼겹살',
-		},
-		{
-			name: '고기집',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20고기집',
-		},
-	],
-	돈까스: [
-		{
-			name: '돈까스 전문점',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20돈까스',
-		},
-		{
-			name: '일식당',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20일식당',
-		},
-	],
-	치킨: [
-		{ name: '치킨집', mapUrl: 'https://map.naver.com/p/search/42경산%20치킨' },
-		{ name: 'BBQ', mapUrl: 'https://map.naver.com/p/search/42경산%20BBQ' },
-	],
-	햄버거: [
-		{
-			name: '버거킹',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20버거킹',
-		},
-		{
-			name: '맥도날드',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20맥도날드',
-		},
-	],
-	파스타: [
-		{
-			name: '이탈리안 레스토랑',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20파스타',
-		},
-		{
-			name: '스파게티 전문점',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20이탈리안',
-		},
-	],
-	덮밥: [
-		{ name: '덮밥집', mapUrl: 'https://map.naver.com/p/search/42경산%20덮밥' },
-		{
-			name: '일식당',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20일식당',
-		},
-	],
-	우동: [
-		{ name: '우동집', mapUrl: 'https://map.naver.com/p/search/42경산%20우동' },
-		{
-			name: '일식당',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20일식당',
-		},
-	],
-	석쇠불고기: [
-		{
-			name: '불고기집',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20불고기',
-		},
-		{
-			name: '한식당',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20한식당',
-		},
-	],
-	닭갈비: [
-		{
-			name: '닭갈비집',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20닭갈비',
-		},
-		{
-			name: '춘천닭갈비',
-			mapUrl: 'https://map.naver.com/p/search/42경산%20춘천닭갈비',
-		},
-	],
-};
+		{ id: 16, name: '닭갈비', category: '한식', image: 'images/닭갈비.webp' },
+	];
+}
 
 // 게임 상태
 let gameState = {
@@ -289,14 +197,28 @@ function showScreen(screenId) {
 	document.getElementById(screenId).classList.add('active');
 }
 
-// 페이지 로드 시 총 게임 수 표시
+// 페이지 로드 시 데이터 로드 및 총 게임 수 표시
 window.addEventListener('DOMContentLoaded', async () => {
+	console.log('페이지 로드 시작...');
+
+	// 음식 및 식당 데이터 로드
+	await loadFoods();
+	await loadRestaurants();
+
+	// 통계 표시
 	const stats = await getStats();
 	document.getElementById('total-games').textContent = stats.totalGames;
+
+	console.log('초기화 완료');
 });
 
 // 게임 시작
-function startGame() {
+async function startGame() {
+	// 음식 데이터가 없으면 로드
+	if (foods.length === 0) {
+		await loadFoods();
+	}
+
 	// 음식 배열 셔플
 	gameState.currentRound = shuffle(foods);
 	gameState.nextRound = [];
@@ -393,11 +315,12 @@ async function showWinner(winner) {
 		document.getElementById('winner-img').alt = winner.name;
 		document.getElementById('winner-name').textContent = winner.name;
 
-		// 식당 목록 표시
+		// 식당 목록 표시 - Firestore에서 가져오기
 		const restaurantList = document.getElementById('restaurant-list');
 		restaurantList.innerHTML = '';
 
-		const foodRestaurants = restaurants[winner.name] || [];
+		// 해당 음식 ID의 식당 필터링
+		const foodRestaurants = restaurants.filter((r) => r.foodId === winner.id);
 
 		if (foodRestaurants.length === 0) {
 			restaurantList.innerHTML =
