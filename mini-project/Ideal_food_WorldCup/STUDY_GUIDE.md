@@ -59,6 +59,112 @@ db.collection("cities").get().then((querySnapshot) => {
 
 ---
 
+### 🔧 Firebase 설정 방법 (npm vs CDN vs 구성)
+
+Firebase 공식문서에는 3가지 설정 방법이 있습니다:
+
+```
+[ npm ]  [ CDN ]  [ 구성 ]
+```
+
+#### 1. npm (Node Package Manager)
+**React, Vue, Next.js 등 번들러 사용하는 프로젝트**
+
+```bash
+# 터미널에서 설치
+npm install firebase
+```
+
+```javascript
+// JavaScript 파일에서 import
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+```
+
+**특징**:
+- ✅ 번들러가 필요한 코드만 포함 (Tree-shaking)
+- ✅ 최종 파일 크기 작음
+- ✅ TypeScript 지원 좋음
+- ❌ 빌드 과정 필요 (webpack, vite 등)
+
+**언제 사용?**
+- React, Vue, Angular 프로젝트
+- 프로덕션 배포용
+
+---
+
+#### 2. CDN (Content Delivery Network) ← **우리가 사용하는 방식**
+**HTML 파일에 직접 import, 번들러 없이 사용**
+
+```html
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+</script>
+```
+
+**특징**:
+- ✅ 설치 없이 바로 사용
+- ✅ 빌드 과정 불필요
+- ✅ HTML 파일만으로 동작
+- ❌ 전체 라이브러리를 로드 (번들 크기 큼)
+
+**언제 사용?** ← **우리 프로젝트**
+- Vanilla JavaScript 프로젝트
+- 빠른 프로토타입
+- 학습/연습용
+
+---
+
+#### 3. 구성 (Hosting에서 자동 설정)
+**Firebase Hosting에 배포할 때 자동으로 설정**
+
+```html
+<!-- Firebase Hosting이 자동으로 주입 -->
+<script src="/__/firebase/10.7.1/firebase-app-compat.js"></script>
+<script src="/__/firebase/10.7.1/firebase-firestore-compat.js"></script>
+<script src="/__/firebase/init.js"></script>
+```
+
+**특징**:
+- ✅ Firebase Hosting 전용
+- ✅ 설정이 자동으로 주입됨
+- ❌ Firebase Hosting에서만 동작
+- ❌ 로컬에서 테스트 어려움
+
+**언제 사용?**
+- Firebase Hosting에 배포할 때만
+
+---
+
+#### 비교표
+
+| 방법 | 설치 필요 | 빌드 필요 | 파일 크기 | 우리 프로젝트 |
+|------|----------|----------|----------|-------------|
+| **npm** | ✅ `npm install` | ✅ webpack/vite | 작음 | ❌ |
+| **CDN** | ❌ | ❌ | 큼 | ✅ 사용 중 |
+| **구성** | ❌ | ❌ | 중간 | ❌ |
+
+---
+
+#### 우리 프로젝트는 CDN 방식!
+
+**이유**:
+1. ✅ Vanilla JavaScript 프로젝트
+2. ✅ 빌드 과정 불필요
+3. ✅ HTML 파일 열면 바로 동작
+4. ✅ 학습하기 좋음
+
+**공식문서 볼 때**: "CDN" 탭을 선택하세요!
+
+---
+
 ### 📖 공식문서에서 복사한 부분
 
 #### `index.html:88-100` - Firebase SDK Import
